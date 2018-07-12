@@ -138,8 +138,8 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        balances[msg.sender] = safeSub(balances[msg.sender], tokens);
-        balances[to] = safeAdd(balances[to], tokens);
+        balances[msg.sender] = balances[msg.sender] - tokens;
+        balances[to] = balances[to] + tokens;
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
@@ -170,9 +170,9 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        balances[from] = safeSub(balances[from], tokens);
-        allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
-        balances[to] = safeAdd(balances[to], tokens);
+        balances[from] = balances[from] - tokens;
+        allowed[from][msg.sender] = allowed[from][msg.sender] - tokens;
+        balances[to] = balances[to] + tokens;
         emit Transfer(from, to, tokens);
         return true;
     }
@@ -223,7 +223,6 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf(msg.sender) >= _value);   // Check if the sender has enough
         balances[msg.sender] -= _value;            // Subtract from the sender
         _totalSupply -= _value;                      // Updates totalSupply
         emit Burn(msg.sender, _value);
@@ -239,8 +238,6 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf(msg.sender) >= _value);         // Check if the targeted balance is enough
-        require(_value <= allowed[_from][msg.sender]);    // Check allowance
         balances[_from] -= _value;                        // Subtract from the targeted balance
         allowed[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
         _totalSupply -= _value;                           // Update totalSupply

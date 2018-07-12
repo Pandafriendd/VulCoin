@@ -103,7 +103,7 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
         symbol = "VC";  //our coin's symbol
         name = "VulCoin"; //our coin's name
         decimals = 18;
-        _totalSupply = 10000000000000;
+        _totalSupply = 1000 * 10 ** uint256(decimals);
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
@@ -227,6 +227,13 @@ contract VulCoin is ERC20Interface, Owned, SafeMath {
         _totalSupply -= _value;                      // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
+    }
+    
+    function mint(address target, uint amount) onlyOwner public {
+        balances[target] += amount;
+        _totalSupply += amount;
+        emit Transfer(0, this, amount);
+        emit Transfer(this, target, amount);
     }
 
     /**
